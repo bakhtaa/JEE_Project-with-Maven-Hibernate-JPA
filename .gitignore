@@ -1,0 +1,24 @@
+# Compiled files
+/build/
+/bin/
+/target/
+
+# Eclipse workspace metadata
+.metadata/
+*.launch
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*~
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
