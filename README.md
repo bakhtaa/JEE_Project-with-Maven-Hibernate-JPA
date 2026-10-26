@@ -330,6 +330,7 @@ Si l'implémentation métier change tout en respectant le même contrat, le cont
 - Plusieurs implémentations de la même interface peuvent nécessiter une configuration de sélection explicite.
 - Si le contrat de l'interface change, ses consommateurs ou ses implémentations peuvent également devoir évoluer.
 - Créer une nouvelle implémentation n'est pas obligatoire pour chaque modification : cela dépend du besoin architectural.
+<img width="970" height="612" alt="image" src="https://github.com/user-attachments/assets/34973d3a-136c-4ec7-bf26-65c0e061657c" />
 
 **À retenir :** les interfaces réduisent la dépendance aux détails d'implémentation, tandis que l'inversion de contrôle et l'injection de dépendances permettent de déléguer à Spring la création et l'assemblage des objets. Ensemble, ces mécanismes facilitent l'évolution, les tests et le remplacement des implémentations avec un impact limité sur les autres couches.
 <img width="767" height="290" alt="image" src="https://github.com/user-attachments/assets/fc435fb3-2e08-4b86-9cd4-245622bda4a2" />
