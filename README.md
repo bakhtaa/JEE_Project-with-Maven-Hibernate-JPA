@@ -219,6 +219,119 @@ Possible improvements include:
 - Improving validation and exception handling.
 - Externalizing database credentials and environment-specific configuration.
 - Adding documentation for the available application features and endpoints.
+## French Version
+## Couplage faible, interfaces et injection de dépendances avec Spring
+
+### 1. Pourquoi utiliser des interfaces entre les couches ?
+
+Une application peut être organisée en trois couches :
+
+- **Web** : reçoit les requêtes et gère les interactions HTTP.
+- **Métier (Service)** : applique les règles métier.
+- **DAO / Repository** : accède aux données.
+
+Pour réduire le couplage, une couche dépend d'une abstraction (interface) plutôt que d'une implémentation concrète de la couche suivante.
+
+Par exemple, `ProduitService` dépend de `IProduitDAO`, et non directement de `ProduitDAOImpl`.
+
+```java
+public interface IProduitDAO {
+    List<Produit> getProducts();
+}
+```
+
+Plusieurs classes peuvent implémenter ce contrat :
+
+- `ProduitDAOImpl` : première stratégie d'accès aux données.
+- `ProduitDAOImplV2` : nouvelle stratégie d'accès aux données.
+
+Tant que les implémentations respectent le contrat de l'interface, le service peut les utiliser sans connaître leurs détails internes.
+
+### 2. Pourquoi l'interface ne suffit-elle pas ?
+
+Sans Spring, on peut écrire :
+
+```java
+IProduitDAO dao = new ProduitDAOImpl();
+```
+
+Le type de la variable est `IProduitDAO`, mais l'objet concret est un `ProduitDAOImpl`.
+
+Si le service crée lui-même cet objet avec `new`, il reste lié à cette classe au moment de la création. Pour utiliser `ProduitDAOImplV2`, il faut modifier cette création.
+
+Le polymorphisme permet d'utiliser différentes implémentations à travers la même interface, mais il ne décide pas qui doit créer ou sélectionner l'objet.
+
+**Le couplage faible nécessite donc de séparer le contrat de la décision de création et de sélection de l'implémentation.**
+
+### 3. Injection de dépendances et inversion de contrôle
+
+Avec Spring, le service exprime son besoin à travers son constructeur :
+
+```java
+@Service
+public class ProduitService {
+
+    private final IProduitDAO dao;
+
+    public ProduitService(IProduitDAO dao) {
+        this.dao = dao;
+    }
+}
+```
+
+Spring détecte les beans, crée les objets gérés par son conteneur et injecte une implémentation compatible de `IProduitDAO`.
+
+- **IoC (Inversion of Control)** : le contrôle de la création et de l'assemblage des objets est confié au conteneur.
+- **DI (Dependency Injection)** : les dépendances nécessaires sont fournies à l'objet, ici par constructeur.
+
+Le service n'a pas besoin d'instancier lui-même `ProduitDAOImpl` ou `ProduitDAOImplV2`.
+
+### 4. Comment sélectionner une implémentation ?
+
+Si une seule implémentation est disponible comme bean, Spring peut généralement l'injecter automatiquement.
+
+Si plusieurs implémentations sont disponibles, il faut lever l'ambiguïté. On peut notamment utiliser :
+
+- `@Primary` pour privilégier une implémentation par défaut.
+- `@Qualifier` pour désigner explicitement le bean souhaité.
+
+Par exemple :
+
+```java
+@Repository
+@Primary
+public class ProduitDAOImplV2 implements IProduitDAO {
+    // Nouvelle implémentation
+}
+```
+
+Le service continue de recevoir un `IProduitDAO` ; il n'a pas besoin de connaître le nom de la classe concrète choisie.
+
+### 5. Appliquer le même principe entre Web et Métier
+
+La couche Web peut dépendre de `IProduitService` plutôt que de `ProduitServiceImpl`.
+
+```java
+public interface IProduitService {
+    List<Produit> getProducts();
+    Produit getProductById(Long id);
+}
+```
+
+Le contrôleur reçoit cette interface par injection de dépendances.
+
+Si l'implémentation métier change tout en respectant le même contrat, le contrôleur n'a généralement pas besoin d'être modifié.
+
+### 6. Limites et bonnes pratiques
+
+- Une interface définit un contrat ; elle ne sélectionne pas l'implémentation.
+- Une interface permet le polymorphisme, mais le choix de l'objet concret doit être effectué quelque part.
+- Spring facilite ce choix en prenant en charge la création et l'injection des beans.
+- Plusieurs implémentations de la même interface peuvent nécessiter une configuration de sélection explicite.
+- Si le contrat de l'interface change, ses consommateurs ou ses implémentations peuvent également devoir évoluer.
+- Créer une nouvelle implémentation n'est pas obligatoire pour chaque modification : cela dépend du besoin architectural.
+
+**À retenir :** les interfaces réduisent la dépendance aux détails d'implémentation, tandis que l'inversion de contrôle et l'injection de dépendances permettent de déléguer à Spring la création et l'assemblage des objets. Ensemble, ces mécanismes facilitent l'évolution, les tests et le remplacement des implémentations avec un impact limité sur les autres couches.
 
 ## Author
 
