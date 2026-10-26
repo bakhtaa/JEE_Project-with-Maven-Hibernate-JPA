@@ -1,5 +1,5 @@
 # Java EE Product Management Application
-
+<img width="1107" height="651" alt="image" src="https://github.com/user-attachments/assets/72382c27-cf16-498c-96e6-a99eea20e7ea" />
 ## Overview
 
 This project is a Java EE web application developed to manage products and their categories using JPA, Hibernate, and Maven.
@@ -332,6 +332,9 @@ Si l'implémentation métier change tout en respectant le même contrat, le cont
 - Créer une nouvelle implémentation n'est pas obligatoire pour chaque modification : cela dépend du besoin architectural.
 
 **À retenir :** les interfaces réduisent la dépendance aux détails d'implémentation, tandis que l'inversion de contrôle et l'injection de dépendances permettent de déléguer à Spring la création et l'assemblage des objets. Ensemble, ces mécanismes facilitent l'évolution, les tests et le remplacement des implémentations avec un impact limité sur les autres couches.
+<img width="767" height="290" alt="image" src="https://github.com/user-attachments/assets/fc435fb3-2e08-4b86-9cd4-245622bda4a2" />
+
+
 
 ## Author
 
